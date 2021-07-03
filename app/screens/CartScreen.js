@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image } from 'react-native';
+// import PayPal from 'rn-expo-paypal-integration';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  Alert,
+  TouchableHighlight,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCart, removeItemFromCart } from '../../actions/userActions';
 import ActivityIndicator from '../components/ActivityIndicator';
@@ -28,7 +37,19 @@ const CartScreen = ({ navigation }) => {
     dispatch(getCart());
   }, [dispatch, successDelete]);
   const removeFromCartHandler = (id) => {
-    dispatch(removeItemFromCart(id));
+    Alert.alert(
+      'Demande de confirmation',
+      'Are you sure ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => dispatch(removeItemFromCart(id)) },
+      ]
+      // { cancelable: false }
+    );
   };
   const checkCouponHandler = () => {};
   const checkoutHandler = () => {
@@ -41,46 +62,79 @@ const CartScreen = ({ navigation }) => {
   };
   return (
     <Screen>
+      {LoadingDelete && <ActivityIndicator visible={true} />}
+      {errorDelete && <Text>{errorDelete}</Text>}
       {Loading ? (
         <ActivityIndicator visible={true} />
       ) : error ? (
         <Text>{error}</Text>
       ) : (
         <View style={styles.container}>
-          <FlatList
-            data={cart.achatDetails}
-            keyExtractor={(item, index) => index.toString()}
-            ItemSeparatorComponent={ListItemSeparator}
-            renderItem={({ item }) => (
-              <View style={styles.card}>
-                <View>
-                  <Image
-                    style={{ width: 180, height: 200, borderRadius: 10 }}
-                    source={{
-                      uri: `data:image/png;base64,${item.service.imgBytes}`,
-                    }}
-                  />
-                </View>
-                <View style={styles.detail}>
-                  <Text style={styles.title}>
-                    {item.service.service.description}
-                  </Text>
-                  <Text style={styles.price}>
-                    {item.service.service.duree} mois
-                  </Text>
-                  <View style={styles.actions}>
-                    <Text style={styles.price}>
-                      {item.service.service.prix}DH
-                    </Text>
-                    <Icon name='delete' backgroundColor={colors.primary} />
+          {cart.achatDetails?.length === 0 ? (
+            <Text>Votre panier est vide</Text>
+          ) : (
+            <>
+              <FlatList
+                data={cart.achatDetails}
+                keyExtractor={(item, index) => index.toString()}
+                ItemSeparatorComponent={ListItemSeparator}
+                renderItem={({ item }) => (
+                  <View style={styles.card}>
+                    <View>
+                      <Image
+                        style={{ width: 180, height: 200, borderRadius: 10 }}
+                        source={{
+                          uri: `data:image/png;base64,${item.service.imgBytes}`,
+                        }}
+                      />
+                    </View>
+                    <View style={styles.detail}>
+                      <Text style={styles.title}>
+                        {item.service.service.description}
+                      </Text>
+                      <Text style={styles.price}>
+                        {item.service.service.duree} mois
+                      </Text>
+                      <Text style={styles.price}>
+                        {item.qte + ' '}
+                        {item.qte === 1 ? 'item' : 'items'}
+                      </Text>
+                      <View style={styles.actions}>
+                        <Text style={styles.price}>
+                          {item.service.service.prix}DH
+                        </Text>
+                        <TouchableHighlight
+                          onPress={() =>
+                            removeFromCartHandler(item.service.service.id)
+                          }
+                        >
+                          <Icon
+                            name='delete'
+                            backgroundColor={colors.primary}
+                          />
+                        </TouchableHighlight>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </View>
-            )}
-          />
+                )}
+              />
+              {/* <PayPal
+                amount={20} //i.e $20
+                orderID={1} //transactionID
+                ProductionClientID={'gfjdgfdjgdf'}
+                success={(a) => {
+                  //callback after payment has been successfully completed
+                  console.log(a);
+                }}
+                failed={(a) => {
+                  //callback if payment is failed
+                }}
+              /> */}
+              <Button title='Apply' />
+            </>
+          )}
         </View>
       )}
-      <Button title='Apply' />
     </Screen>
   );
 };

@@ -11,6 +11,8 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import Text from '../components/Text';
 import { getServices, getListCours } from '../../actions/coursActions';
@@ -32,14 +34,20 @@ const HomeScreen = ({ navigation }) => {
         <Text>{error}</Text>
       ) : (
         <SafeAreaView>
-          <Text style={styles.title}>List Services</Text>
-          <ScrollView horizontal>
+          <Text style={styles.title}>Services List</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={200}
+            // pagingEnabled
+            decelerationRate='fast'
+          >
             {services.map((item) => (
-              <View key={item.service.id}>
-                <Text style={{ textAlign: 'center' }}>
+              <View key={item.service.id} style={{ paddingHorizontal: 10 }}>
+                <Text style={{ textAlign: 'center', fontSize: 15 }}>
                   {item.service.description}
                 </Text>
-                <TouchableHighlight
+                <TouchableWithoutFeedback
                   onPress={() => {
                     navigation.navigate('Service', {
                       serviceId: item.service.id,
@@ -47,12 +55,12 @@ const HomeScreen = ({ navigation }) => {
                   }}
                 >
                   <Image
-                    style={{ width: 200, height: 200 }}
+                    style={{ width: 150, height: 150, borderRadius: 10 }}
                     source={{
                       uri: `data:image/png;base64,${item.imgBytes}`,
                     }}
                   />
-                </TouchableHighlight>
+                </TouchableWithoutFeedback>
               </View>
             ))}
           </ScrollView>
@@ -64,7 +72,7 @@ const HomeScreen = ({ navigation }) => {
         <Text>{errorCours}</Text>
       ) : (
         <View style={styles.cardContainer}>
-          <Text style={styles.title}>List Cours</Text>
+          <Text style={styles.title}>Courses List</Text>
           <ScrollView>
             {cours.map((item) => (
               <Card style={styles.card} key={item.cours.id}>
@@ -90,11 +98,14 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   cardContainer: {
     flex: 1,
+    marginVertical: 10,
   },
   title: {
     fontSize: 24,
     marginVertical: 15,
     marginLeft: 5,
     fontWeight: '400',
+    paddingHorizontal: 10,
+    fontFamily: Platform.OS === 'android' ? 'Roboto' : 'Helvetica',
   },
 });

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseUrl ="http://192.168.43.36:8080"
+const baseUrl = 'http://192.168.43.36:8080';
 import {
   COURS_LIST_REQUEST,
   COURS_LIST_FAIL,
@@ -28,10 +28,7 @@ export const getListCours = () => async (dispatch, getState) => {
         Accept: 'application/json',
       },
     };
-    const { data } = await axios.get(
-      `${baseUrl}/api/cours`,
-      config
-    );
+    const { data } = await axios.get(`${baseUrl}/api/cours`, config);
     dispatch({ type: COURS_LIST_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -54,10 +51,7 @@ export const getServices = () => async (dispatch, getState) => {
         Accept: 'application/json',
       },
     };
-    const { data } = await axios.get(
-      `${baseUrl}/api/abonnements`,
-      config
-    );
+    const { data } = await axios.get(`${baseUrl}/api/abonnements`, config);
     dispatch({ type: SERVICES_LIST_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -84,10 +78,7 @@ export const getServicesDetail = (id) => async (dispatch, getState) => {
         Accept: 'application/json',
       },
     };
-    const { data } = await axios.get(
-      `${baseUrl}/api/services/${id}`,
-      config
-    );
+    const { data } = await axios.get(`${baseUrl}/api/services/${id}`, config);
     dispatch({ type: SERVICES_DETAIL_SUCCESS, payload: data });
   } catch (error) {
     dispatch({

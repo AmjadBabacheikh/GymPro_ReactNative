@@ -9,6 +9,7 @@ import routes from '../navigation/routes';
 import Screen from '../components/Screen';
 import { getMyProfile, getMyImage } from '../../actions/userActions';
 import ActivityIndicator from '../components/ActivityIndicator';
+const baseUrl = 'http://192.168.43.36:8080';
 
 const menuItems = [
   {
@@ -20,12 +21,20 @@ const menuItems = [
     targetScreen: routes.CART,
   },
   {
-    title: 'Factures',
+    title: 'Invoices',
     icon: {
       name: 'file',
       backgroundColor: colors.secondary,
     },
-    targetScreen: routes.MESSAGES,
+    targetScreen: routes.FACTURES,
+  },
+  {
+    title: 'Password',
+    icon: {
+      name: 'lock',
+      backgroundColor: colors.medium,
+    },
+    targetScreen: routes.PASSWORD,
   },
 ];
 
@@ -37,6 +46,8 @@ function AccountScreen({ navigation }) {
   const { Loading: LoadingProfile, user, error: errorProfile } = userProfile;
   const userImage = useSelector((state) => state.userImage);
   const { Loading: LoadingImage, image, error: errorImage } = userImage;
+  const imgFileName = user?.imgFileName;
+  // console.log(imgFileName);
   const isEmpty = function (obj) {
     for (var key in obj) {
       if (obj.hasOwnProperty(key)) return false;
@@ -44,7 +55,7 @@ function AccountScreen({ navigation }) {
     return true;
   };
   useEffect(() => {
-    if (userInfo) {
+    if (isEmpty(user)) {
       dispatch(getMyProfile());
       dispatch(getMyImage());
     }
@@ -53,20 +64,28 @@ function AccountScreen({ navigation }) {
   //   name: 'amjad',
   //   email: 'babacheikhamjad@gmail.com',
   // });
-
   return (
     <Screen style={styles.screen}>
       {LoadingProfile && LoadingImage ? (
         <ActivityIndicator visible={true} />
-      ) : errorProfile || errorImage ? (
-        <Text>{errorProfile + '' + errorImage}</Text>
+      ) : errorProfile ? (
+        <Text>{errorProfile}</Text>
       ) : (
         <>
           <View style={styles.container}>
             <ListItem
-              title={user.nom + ' ' + user.prenom}
-              subTitle={user.cin}
-              image={{ uri: image }}
+              title={user?.nom + ' ' + user?.prenom}
+              subTitle={user?.cin}
+              image={{
+                uri: `http://192.168.43.36:8080/api/image/${imgFileName}`,
+                // method: 'GET',
+                // headers: {
+                //   Authorization: `${userInfo}`,
+                // },
+              }}
+              onPress={() => {
+                navigation.navigate(routes.PROFILE);
+              }}
             />
           </View>
           <View style={styles.container}>

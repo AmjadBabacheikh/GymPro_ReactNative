@@ -462,9 +462,6 @@ export const clientListFacturesReducer = (state = { factures: [] }, action) => {
       return {
         Loading: false,
         factures: payload.content,
-        itemsCountPerPage: payload.size,
-        totalPages: payload.totalPages,
-        totalElements: payload.totalElements,
       };
     case LIST_FACTURES_FAIL:
       return { Loading: false, error: payload };

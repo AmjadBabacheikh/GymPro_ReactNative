@@ -4,5 +4,8 @@ export default Object.freeze({
   LOGIN: 'Login',
   MESSAGES: 'Messages',
   REGISTER: 'Register',
-  CART:"Cart"
+  CART: 'Cart',
+  PROFILE: 'Profile',
+  FACTURES: 'Factures',
+  PASSWORD: 'Password',
 });

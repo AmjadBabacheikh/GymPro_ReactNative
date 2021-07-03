@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Base64ArrayBuffer from 'base64-arraybuffer';
 import { storeToken, removeToken } from '../app/auth/storage';
 const baseUrl = 'http://192.168.43.36:8080';
 import {
@@ -119,16 +120,7 @@ export const login = (email, password) => async (dispatch) => {
 };
 
 export const register =
-  (
-    CIN,
-    email,
-    password,
-    firstName,
-    genre,
-    dateNaissance,
-    lastName,
-    phoneNumber
-  ) =>
+  (CIN, email, password, firstName, lastName, phoneNumber) =>
   async (dispatch) => {
     try {
       dispatch({
@@ -150,8 +142,8 @@ export const register =
             nom: lastName,
             prenom: firstName,
             cin: CIN,
-            dateNaissance,
-            genre,
+            dateNaissance: new Date().toISOString().slice(0, 10),
+            genre: 'Homme',
             telephone: phoneNumber,
           },
         },
@@ -409,11 +401,11 @@ export const updateProfile =
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `${userInfo.jwt}`,
+          Authorization: `${userInfo}`,
         },
       };
       const { data } = await axios.put(
-        `/api/user/profil`,
+        `${baseUrl}/api/user/profil`,
         {
           prenom: firstName,
           nom: lastName,
@@ -446,11 +438,11 @@ export const updatePassword = (password) => async (dispatch, getState) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `${userInfo.jwt}`,
+        Authorization: `${userInfo}`,
       },
     };
     const { data } = await axios.put(
-      `/api/user/password`,
+      `${baseUrl}/api/user/password`,
       {
         password,
       },
@@ -607,19 +599,18 @@ export const getMyImage = () => async (dispatch, getState) => {
     } = getState();
     const config = {
       headers: {
-        'Content-Type': 'image/jpeg',
         Authorization: `${userInfo}`,
       },
+      responseType: 'arraybuffer',
     };
-    const { data } = await axios.get(`${baseUrl}/api/user/image`, config);
-    // let blob = new Blob([response.data], {
-    //   type: response.headers['content-type'],
-    // });
-    // let image = URL.createObjectURL(blob);
-    dispatch({
-      type: GET_USER_IMAGE_SUCCESS,
-      payload: `data:image/png;base64${data}`,
+    const response = await axios.get(`/api/user/image`, config);
+    let blob = new Blob([response.data], {
+      type: response.headers['content-type'],
     });
+    let image = URL.createObjectURL(blob);
+    // let image = Buffer.from(response.data, 'binary').toString('base64');
+    console.log(response.data);
+    dispatch({ type: GET_USER_IMAGE_SUCCESS, payload: image });
   } catch (error) {
     dispatch({
       type: GET_USER_IMAGE_FAIL,
@@ -676,12 +667,12 @@ export const createCart = (serviceId, qte) => async (dispatch, getState) => {
     } = getState();
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${userInfo.jwt}`,
+        Accept: 'application/json',
+        Authorization: `${userInfo}`,
       },
     };
     await axios.post(
-      '/api/client/cart',
+      `${baseUrl}/api/client/cart`,
       {
         achatDetails: [{ service: { id: serviceId }, qte }],
       },
@@ -764,10 +755,10 @@ export const removeItemFromCart = (id) => async (dispatch, getState) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `${userInfo.jwt}`,
+        Authorization: `${userInfo}`,
       },
     };
-    await axios.delete(`/api/client/cart/services/${id}`, config);
+    await axios.delete(`${baseUrl}/api/client/cart/services/${id}`, config);
     dispatch({ type: REMOVE_FROM_CART_SUCCESS });
   } catch (error) {
     dispatch({
@@ -779,7 +770,7 @@ export const removeItemFromCart = (id) => async (dispatch, getState) => {
     });
   }
 };
-export const getClientFacture = (pageNo) => async (dispatch, getState) => {
+export const getClientFacture = () => async (dispatch, getState) => {
   try {
     dispatch({
       type: LIST_FACTURES_REQUEST,
@@ -789,14 +780,12 @@ export const getClientFacture = (pageNo) => async (dispatch, getState) => {
     } = getState();
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${userInfo.jwt}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+        Authorization: `${userInfo}`,
       },
     };
-    const { data } = await axios.get(
-      `/api/client/factures?pageNo=${pageNo}&pageSize=${2}`,
-      config
-    );
+    const { data } = await axios.get(`${baseUrl}/api/client/factures`, config);
     dispatch({ type: LIST_FACTURES_SUCCESS, payload: data });
   } catch (error) {
     dispatch({

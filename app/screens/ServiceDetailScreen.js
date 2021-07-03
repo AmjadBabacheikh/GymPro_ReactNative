@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getServicesDetail } from '../../actions/coursActions';
 import { createCart, getCart } from '../../actions/userActions';
 import { CREATE_CART_RESET } from '../../constants/userConstants';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 import ActivityIndicator from '../components/ActivityIndicator';
 import Text from '../components/Text';
 import { Avatar, Card, Title, Paragraph } from 'react-native-paper';
@@ -34,8 +34,14 @@ const ServiceDetailScreen = ({ route, navigation }) => {
       dispatch(getServicesDetail(serviceId));
     }
   }, [dispatch, serviceId, success]);
+  const handleSubmit = () => {
+    dispatch(createCart(serviceId, 1));
+  };
   return (
     <>
+      {/* {LoadingAdd && <ActivityIndicator visible={true} />} */}
+      {errorAdd && <Text>{errorAdd}</Text>}
+      {success && Alert.alert('Produit bien ajoute a votre panier')}
       {Loading ? (
         <ActivityIndicator />
       ) : error ? (
@@ -58,7 +64,7 @@ const ServiceDetailScreen = ({ route, navigation }) => {
                     <Text>{service.service.duree}mois</Text>
                   </View>
                 </Card.Content>
-                <Button title='BUT NOW' onPress={() => {}} />
+                <Button title='BUT NOW' onPress={handleSubmit} />
               </Card>
             </View>
           )}
